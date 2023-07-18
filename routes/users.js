@@ -17,4 +17,6 @@ router.patch('/users/me', updateUser);
 
 router.patch('/users/me/avatar', updateAvatar);
 
+router.all('*', (req, res) => res.status(400).send({ message: 'Страница не найдена' }));
+
 module.exports = router;
