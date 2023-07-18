@@ -72,7 +72,11 @@ module.exports.dislikeCard = (req, res) =>
       res.send({ data: card });
     })
     .catch((err) => {
-      checkCard(err, res);
+      if (err.kind === 'ObjectId') {
+        return res
+          .status(404)
+          .send({ message: 'Карточка с указанным _id не найдена' });
+      }
       checkDate(err, res, 'Переданы некорректные данные для снятия лайка');
       res.status(500).send({ message: 'Произошла ошибка' });
     });
