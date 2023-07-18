@@ -49,7 +49,7 @@ module.exports.createUser = (req, res) => {
       checkDate(
         err,
         res,
-        'Переданы некорректные данные при создании пользователя'
+        'Переданы некорректные данные при создании пользователя',
       );
       res.status(500).send({ message: 'Произошла ошибка' });
     });
@@ -66,7 +66,7 @@ module.exports.updateUser = (req, res) => {
       new: true,
       runValidators: true,
       upsert: true,
-    }
+    },
   )
     .then((user) => {
       checkUser(user, res);
@@ -76,7 +76,7 @@ module.exports.updateUser = (req, res) => {
       checkDate(
         err,
         res,
-        'Переданы некорректные данные при обновлении профиля'
+        'Переданы некорректные данные при обновлении профиля',
       );
       res.status(500).send({ message: 'Произошла ошибка' });
     });
@@ -99,7 +99,7 @@ module.exports.updateAvatar = (req, res) => {
       checkDate(
         err,
         res,
-        'Переданы некорректные данные при обновлении аватара'
+        'Переданы некорректные данные при обновлении аватара',
       );
       res.status(500).send({ message: 'Произошла ошибка' });
     });
