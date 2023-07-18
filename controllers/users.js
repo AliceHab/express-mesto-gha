@@ -57,7 +57,15 @@ module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
   const owner = req.user._id;
 
-  User.findByIdAndUpdate(owner, { name, about })
+  User.findByIdAndUpdate(
+    owner,
+    { name, about },
+    {
+      new: true,
+      runValidators: true,
+      upsert: true,
+    },
+  )
     .then((user) => {
       checkUser(user, res);
       res.send({ data: user });
