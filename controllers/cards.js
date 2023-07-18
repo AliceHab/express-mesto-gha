@@ -25,6 +25,11 @@ module.exports.getCards = (req, res) => {
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
+      if (!card) {
+        return res
+          .status(404)
+          .send({ message: 'Карточка с указанным _id не найдена' });
+      }
       res.send({ data: card });
     })
     .catch((err) => {
@@ -45,38 +50,48 @@ module.exports.createCard = (req, res) => {
     });
 };
 
-module.exports.likeCard = (req, res) =>
+module.exports.likeCard = (req, res) => {
   // eslint-disable-next-line implicit-arrow-linebreak
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true, runValidators: true }
   )
     .then((card) => {
-      res.send({ data: card });
-    })
-    .catch((err) => {
-      checkCard(err, res);
-      checkDate(err, res, 'Переданы некорректные данные для постановки лайка');
-      res.status(500).send({ message: 'Произошла ошибка' });
-    });
-
-module.exports.dislikeCard = (req, res) =>
-  // eslint-disable-next-line implicit-arrow-linebreak
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user._id } },
-    { new: true, runValidators: true },
-  )
-    .then((card) => {
-      res.send({ data: card });
-    })
-    .catch((err) => {
-      if (err.kind === 'ObjectId') {
+      if (!card) {
         return res
           .status(404)
           .send({ message: 'Карточка с указанным _id не найдена' });
       }
-      checkDate(err, res, 'Переданы некорректные данные для снятия лайка');
+      res.send({ data: card });
+    })
+    .catch((err) => {
+      if (err.kind === 'ObjectId') {
+        return res.status(400).send({ message: 'Ошибка в данных' });
+      }
       res.status(500).send({ message: 'Произошла ошибка' });
     });
+};
+
+module.exports.dislikeCard = (req, res) => {
+  // eslint-disable-next-line implicit-arrow-linebreak
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user._id } },
+    { new: true, runValidators: true }
+  )
+    .then((card) => {
+      if (!card) {
+        return res
+          .status(404)
+          .send({ message: 'Карточка с указанным _id не найдена' });
+      }
+      res.send({ data: card });
+    })
+    .catch((err) => {
+      if (err.kind === 'ObjectId') {
+        return res.status(400).send({ message: 'Ошибка в данных' });
+      }
+      res.status(500).send({ message: 'Произошла ошибка' });
+    });
+};
