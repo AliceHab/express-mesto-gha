@@ -1,12 +1,12 @@
 const Card = require('../models/card');
 
-const checkCard = (err, res) => {
-  if (err.kind === 'ObjectId') {
-    return res
-      .status(404)
-      .send({ message: 'Карточка с указанным _id не найдена' });
-  }
-};
+// const checkCard = (err, res) => {
+//   if (err.kind === 'ObjectId') {
+//     return res
+//       .status(404)
+//       .send({ message: 'Карточка с указанным _id не найдена' });
+//   }
+// };
 
 const checkDate = (err, res, errorText) => {
   if (err.name === 'ValidationError') {
@@ -33,7 +33,9 @@ module.exports.deleteCard = (req, res) => {
       res.send({ data: card });
     })
     .catch((err) => {
-      checkCard(err, res);
+      if (err.kind === 'ObjectId') {
+        return res.status(400).send({ message: 'Ошибка в данных' });
+      }
       res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
@@ -55,7 +57,7 @@ module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .then((card) => {
       if (!card) {
@@ -78,7 +80,7 @@ module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .then((card) => {
       if (!card) {
