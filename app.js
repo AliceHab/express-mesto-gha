@@ -26,5 +26,7 @@ app.use(require('./routes/users'));
 // Карточки
 app.use(temporaryId);
 app.use(require('./routes/cards'));
+// Обрабтка несуществующих страниц
+app.use('*', (req, res) => res.status(404).send({ message: 'Страница не найдена' }));
 
 app.listen(PORT, () => {});
