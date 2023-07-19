@@ -29,7 +29,6 @@ module.exports.createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
-      console.log(err._message);
       if (err._message === 'user validation failed') {
         return res.status(400).send({ message: 'Ошибка данных' });
       }
@@ -55,9 +54,10 @@ module.exports.updateUser = (req, res) => {
       res.send({ data: user });
     })
     .catch((err) => {
+      console.log(err.name);
       if (err.message === 'NotValidId') {
         res.status(404).send({ message: 'Пользователь не найден' });
-      } else if (err.kind === 'ObjectId') {
+      } else if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Ошибка в данных' });
       } else {
         res.status(500).send({ message: 'Произошла ошибка' });
