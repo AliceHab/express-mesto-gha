@@ -26,13 +26,15 @@ module.exports.getUser = (req, res) => {
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
-  if (!name || !about || !avatar) {
-    return res.status(400).send({ message: 'Отсутствуют обязательные поля' });
-  }
-
   User.create({ name, about, avatar })
     .then((user) => res.status(201).send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch((err) => {
+      console.log(err._message);
+      if (err._message === 'user validation failed') {
+        return res.status(400).send({ message: 'Ошибка данных' });
+      }
+      res.status(500).send({ message: 'Произошла ошибка' });
+    });
 };
 
 module.exports.updateUser = (req, res) => {
