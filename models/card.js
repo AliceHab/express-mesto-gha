@@ -15,10 +15,12 @@ const cardSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     required: [true, 'Поле "owner" должно быть заполнено'],
   },
-  likes: {
-    type: mongoose.Schema.Types.ObjectId,
-    default: [],
-  },
+  likes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      default: [],
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now,
