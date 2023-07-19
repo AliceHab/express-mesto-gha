@@ -29,6 +29,7 @@ module.exports.createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
+      // eslint-disable-next-line no-underscore-dangle
       if (err._message === 'user validation failed') {
         return res.status(400).send({ message: 'Ошибка данных' });
       }
@@ -47,14 +48,13 @@ module.exports.updateUser = (req, res) => {
       new: true,
       runValidators: true,
       upsert: true,
-    }
+    },
   )
     .orFail(new Error('NotValidId'))
     .then((user) => {
       res.send({ data: user });
     })
     .catch((err) => {
-      console.log(err.name);
       if (err.message === 'NotValidId') {
         res.status(404).send({ message: 'Пользователь не найден' });
       } else if (err.name === 'ValidationError') {
