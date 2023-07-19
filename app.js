@@ -2,13 +2,15 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
 const app = express();
 
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {});
+const helmet = require('helmet');
+
+mongoose.connect(DB_URL, {});
 
 // Временный мидлвэр для авторизаци
 const temporaryId = (req, res, next) => {
@@ -20,10 +22,12 @@ const temporaryId = (req, res, next) => {
 };
 
 // Пользователь
+app.use(helmet());
 app.use(temporaryId);
 app.use(require('./routes/users'));
 
 // Карточки
+app.use(helmet());
 app.use(temporaryId);
 app.use(require('./routes/cards'));
 // Обрабтка несуществующих страниц
