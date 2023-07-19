@@ -31,7 +31,6 @@ module.exports.createUser = (req, res) => {
   }
 
   User.create({ name, about, avatar })
-    .orFail(new Error('NotValidId'))
     .then((user) => res.status(201).send({ data: user }))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
@@ -47,7 +46,7 @@ module.exports.updateUser = (req, res) => {
       new: true,
       runValidators: true,
       upsert: true,
-    },
+    }
   )
     .orFail(new Error('NotValidId'))
     .then((user) => {
