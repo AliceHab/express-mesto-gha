@@ -45,7 +45,7 @@ module.exports.createCard = (req, res) => {
   const owner = req.user._id;
 
   Card.create({ name, link, owner })
-    .then((card) => res.status.send({ data: card }))
+    .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       checkDate(err, res, 'Переданы некорректные данные при создании карточки');
       res.status(500).send({ message: 'Произошла ошибка' });
@@ -57,7 +57,7 @@ module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true, runValidators: true }
   )
     .then((card) => {
       if (!card) {
@@ -80,7 +80,7 @@ module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true, runValidators: true }
   )
     .then((card) => {
       if (!card) {
