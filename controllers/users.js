@@ -1,21 +1,5 @@
 const User = require('../models/user');
 
-const checkUser = (err, res) => {
-  if (err.kind === 'ObjectId') {
-    return res
-      .status(404)
-      .send({ message: 'Пользователь с указанным _id не найден' });
-  }
-};
-
-const checkDate = (err, res, errorText) => {
-  if (err.name === 'ValidationError') {
-    return res.status(400).send({
-      message: errorText,
-    });
-  }
-};
-
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
@@ -24,35 +8,32 @@ module.exports.getUsers = (req, res) => {
 
 module.exports.getUser = (req, res) => {
   User.findById(req.params.userId)
+    .orFail(new Error('NotValidId'))
     .then((user) => {
-      if (!user) {
-        return res
-          .status(404)
-          .send({ message: 'Пользователь с указанным _id не найден' });
-      }
       res.send({ data: user });
     })
     .catch((err) => {
-      if (err.kind === 'ObjectId') {
+      if (err.message === 'NotValidId') {
+        res.status(404).send({ message: 'Пользователь не найден' });
+      } else if (err.kind === 'ObjectId') {
         return res.status(400).send({ message: 'Ошибка в данных' });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка' });
       }
-      res.status(500).send({ message: 'Произошла ошибка' });
     });
 };
 
 module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
+  if (!name || !about || !avatar) {
+    return res.status(400).send({ message: 'Отсутствуют обязательные поля' });
+  }
+
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => {
-      checkDate(
-        err,
-        res,
-        'Переданы некорректные данные при создании пользователя',
-      );
-      res.status(500).send({ message: 'Произошла ошибка' });
-    });
+    .orFail(new Error('NotValidId'))
+    .then((user) => res.status(201).send({ data: user }))
+    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 module.exports.updateUser = (req, res) => {
@@ -68,17 +49,18 @@ module.exports.updateUser = (req, res) => {
       upsert: true,
     },
   )
+    .orFail(new Error('NotValidId'))
     .then((user) => {
-      checkUser(user, res);
       res.send({ data: user });
     })
     .catch((err) => {
-      checkDate(
-        err,
-        res,
-        'Переданы некорректные данные при обновлении профиля',
-      );
-      res.status(500).send({ message: 'Произошла ошибка' });
+      if (err.message === 'NotValidId') {
+        res.status(404).send({ message: 'Пользователь не найден' });
+      } else if (err.kind === 'ObjectId') {
+        return res.status(400).send({ message: 'Ошибка в данных' });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка' });
+      }
     });
 };
 
@@ -91,16 +73,17 @@ module.exports.updateAvatar = (req, res) => {
     runValidators: true,
     upsert: true,
   })
+    .orFail(new Error('NotValidId'))
     .then((user) => {
-      checkUser(user, res);
       res.send({ data: user });
     })
     .catch((err) => {
-      checkDate(
-        err,
-        res,
-        'Переданы некорректные данные при обновлении аватара',
-      );
-      res.status(500).send({ message: 'Произошла ошибка' });
+      if (err.message === 'NotValidId') {
+        res.status(404).send({ message: 'Пользователь не найден' });
+      } else if (err.kind === 'ObjectId') {
+        return res.status(400).send({ message: 'Ошибка в данных' });
+      } else {
+        res.status(500).send({ message: 'Произошла ошибка' });
+      }
     });
 };
