@@ -29,7 +29,6 @@ module.exports.createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
-      console.log(err.name);
       // eslint-disable-next-line no-underscore-dangle
       if (err.name === 'ValidationError') {
         return res.status(400).send({ message: 'Ошибка данных' });
@@ -49,7 +48,7 @@ module.exports.updateUser = (req, res) => {
       new: true,
       runValidators: true,
       upsert: true,
-    }
+    },
   )
     .orFail(new Error('NotValidId'))
     .then((user) => {
