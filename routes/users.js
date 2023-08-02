@@ -1,4 +1,5 @@
 const router = require('express').Router();
+const { celebrate, Joi } = require('celebrate');
 const {
   getUsers,
   getUser,
@@ -6,7 +7,6 @@ const {
   updateAvatar,
   getCurrentUser,
 } = require('../controllers/users');
-const { celebrate, Joi } = require('celebrate');
 
 router.get('/users', getUsers);
 
@@ -19,7 +19,7 @@ router.get(
       userId: Joi.string().alphanum().length(24),
     }),
   }),
-  getUser
+  getUser,
 );
 
 router.patch(
@@ -33,7 +33,7 @@ router.patch(
       Authorization: Joi.string().alphanum(),
     }),
   }),
-  updateUser
+  updateUser,
 );
 
 router.patch(
@@ -46,7 +46,7 @@ router.patch(
       Authorization: Joi.string().alphanum(),
     }),
   }),
-  updateAvatar
+  updateAvatar,
 );
 
 module.exports = router;
