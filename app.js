@@ -40,18 +40,17 @@ app.post(
   login,
 );
 
-// Обработка несуществующих страниц
-app.use('*', (req, res) => res.status(404).send({ message: 'Страница не найдена' }));
-
-app.use(auth);
-
 // Пользователь
 app.use(helmet());
+app.use(auth);
 app.use(require('./routes/users'));
 
 // Карточки
 app.use(helmet());
+app.use(auth);
 app.use(require('./routes/cards'));
+
+app.use('*', (req, res) => res.status(404).send({ message: 'Страница не найдена' }));
 
 app.use(errors());
 

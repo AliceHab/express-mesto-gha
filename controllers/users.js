@@ -57,7 +57,7 @@ module.exports.createUser = (req, res, next) => {
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password, next)
     .select('+password')
     .then((user) => {
       const token = jwt.sign(
@@ -76,8 +76,6 @@ module.exports.login = (req, res, next) => {
       } else {
         throw new UnauthorizedError('Ошибка аутентификации');
       }
-      // eslint-disable-next-line no-unreachable
-      next(err);
     })
     .catch(next);
 };
