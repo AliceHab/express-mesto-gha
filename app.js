@@ -20,8 +20,11 @@ app.post(
   '/signup',
   celebrate({
     body: Joi.object().keys({
-      email: Joi.string().required(),
+      email: Joi.string().email.required(),
       password: Joi.string().required(),
+      name: Joi.string().min(2).max(30),
+      about: Joi.string().min(2).max(30),
+      avatar: Joi.string().uri('http', 'https'),
     }),
   }),
   createUser,
@@ -37,6 +40,9 @@ app.post(
   login,
 );
 
+// Обработка несуществующих страниц
+app.use('*', (req, res) => res.status(404).send({ message: 'Страница не найдена' }));
+
 app.use(auth);
 
 // Пользователь
@@ -46,8 +52,6 @@ app.use(require('./routes/users'));
 // Карточки
 app.use(helmet());
 app.use(require('./routes/cards'));
-// Обработка несуществующих страниц
-app.use('*', (req, res) => res.status(404).send({ message: 'Страница не найдена' }));
 
 app.use(errors());
 
