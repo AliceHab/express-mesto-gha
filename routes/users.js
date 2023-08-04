@@ -29,9 +29,6 @@ router.patch(
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
     }),
-    headers: Joi.object().keys({
-      Authorization: Joi.string().alphanum(),
-    }),
   }),
   updateUser,
 );
@@ -41,9 +38,6 @@ router.patch(
   celebrate({
     body: Joi.object().keys({
       avatar: Joi.string().required().alphanum(),
-    }),
-    headers: Joi.object().keys({
-      Authorization: Joi.string().alphanum(),
     }),
   }),
   updateAvatar,
