@@ -31,16 +31,23 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const {
-    name, about, avatar, password, email,
-  } = req.body;
+  const { name, about, avatar, password, email } = req.body;
 
   bcrypt
     .hash(password, 10)
-    .then((hash) => User.create({
-      name, about, avatar, email, password: hash,
-    }))
-    .then((user) => res.status(201).send({ data: user }))
+    .then((hash) =>
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
+      })
+    )
+    .then((user) => {
+      const { _id, name, about, avatar, email } = user;
+      res.status(201).send({ data: { _id, name, about, avatar, email } });
+    })
     .catch((err) => {
       // eslint-disable-next-line no-underscore-dangle
       if (err.name === 'ValidationError') {
@@ -58,19 +65,19 @@ module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password, next)
-    .select('+password')
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
         '2eff316546783160b0e6bfaf8a81862d',
         {
           expiresIn: '7d',
-        },
+        }
       );
 
       res.send({ token });
     })
     .catch((err) => {
+      console.log(err);
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Ошибка в данных');
       } else {
@@ -91,7 +98,7 @@ module.exports.updateUser = (req, res, next) => {
       new: true,
       runValidators: true,
       upsert: true,
-    },
+    }
   )
     .orFail(new Error('NotValidId'))
     .then((user) => {

@@ -14,10 +14,10 @@ router.delete(
   '/cards/:cardId',
   celebrate({
     params: Joi.object().keys({
-      cardId: Joi.string().alphanum().length(24),
+      cardId: Joi.string().length(24).hex().required(),
     }),
   }),
-  deleteCard,
+  deleteCard
 );
 
 router.post(
@@ -25,13 +25,10 @@ router.post(
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().required().min(2).max(30),
-      link: Joi.string().required().alphanum(),
-    }),
-    headers: Joi.object().keys({
-      Authorization: Joi.string().alphanum(),
+      link: Joi.string().required(),
     }),
   }),
-  createCard,
+  createCard
 );
 
 router.put('/cards/:cardId/likes', likeCard);

@@ -3,22 +3,6 @@ const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-req-err');
 const UnauthorizedError = require('../errors/unauthorized-err');
 
-// const checkCard = (err, res) => {
-//   if (err.kind === 'ObjectId') {
-//     return res
-//       .status(404)
-//       .send({ message: 'Карточка с указанным _id не найдена' });
-//   }
-// };
-
-const checkOwner = (cardId, userId) => {
-  Card.findById(cardId).then((card) => {
-    if (!card.owner === userId) {
-      throw new UnauthorizedError('Ошибка аутентификации');
-    }
-  });
-};
-
 // eslint-disable-next-line no-unused-vars
 const checkDate = (err, res, errorText) => {
   if (err.name === 'ValidationError') {
@@ -33,22 +17,26 @@ module.exports.getCards = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  const owner = req.user._id;
+  const user = req.user._id;
 
-  checkOwner(req.params.cardId, owner);
-
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
-      if (!card) {
+      if (!(card.owner.toString() === user)) {
+        throw new UnauthorizedError('Ошибка аутентификации');
+      } else if (!card) {
         throw new NotFoundError('Карточка не найдена');
+      } else {
+        Card.findByIdAndRemove(req.params.cardId)
+          .then((deletedCard) => {
+            res.send({ data: deletedCard });
+          })
+          .catch((err) => {
+            if (err.kind === 'ObjectId') {
+              throw new BadRequestError('Ошибка в данных');
+            }
+            next(err);
+          });
       }
-      res.send({ data: card });
-    })
-    .catch((err) => {
-      if (err.kind === 'ObjectId') {
-        throw new BadRequestError('Ошибка в данных');
-      }
-      next(err);
     })
     .catch(next);
 };
@@ -71,7 +59,7 @@ module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true, runValidators: true }
   )
     .then((card) => {
       if (!card) {
@@ -93,7 +81,7 @@ module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true, runValidators: true }
   )
     .then((card) => {
       if (!card) {

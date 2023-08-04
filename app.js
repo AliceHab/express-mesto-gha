@@ -3,16 +3,29 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 
+const NotFoundError = require('./errors/not-found-err');
+
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const { createUser, login } = require('./controllers/users');
+
 const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/error-handler');
 
 const app = express();
 
-const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
+const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } =
+  process.env;
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
 
 app.use(bodyParser.json());
+
+app.use(limiter);
 
 mongoose.connect(DB_URL, {});
 
@@ -27,7 +40,7 @@ app.post(
       avatar: Joi.string().uri({ scheme: ['http', 'https'] }),
     }),
   }),
-  createUser,
+  createUser
 );
 app.post(
   '/signin',
@@ -37,7 +50,7 @@ app.post(
       password: Joi.string().required(),
     }),
   }),
-  login,
+  login
 );
 
 // Пользователь
@@ -50,17 +63,12 @@ app.use(helmet());
 app.use(auth);
 app.use(require('./routes/cards'));
 
-app.use('*', (req, res) => res.status(404).send({ message: 'Страница не найдена' }));
+app.use('*', (req, res) => {
+  throw new NotFoundError('Страница не найдена');
+});
 
 app.use(errors());
 
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-
-  res.status(statusCode).send({
-    message: statusCode === 500 ? 'Произошла ошибка' : message,
-  });
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {});
