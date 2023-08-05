@@ -19,7 +19,7 @@ router.get(
       userId: Joi.string().length(24).hex().required(),
     }),
   }),
-  getUser,
+  getUser
 );
 
 router.patch(
@@ -30,17 +30,19 @@ router.patch(
       about: Joi.string().min(2).max(30),
     }),
   }),
-  updateUser,
+  updateUser
 );
 
 router.patch(
   '/users/me/avatar',
   celebrate({
     body: Joi.object().keys({
-      avatar: Joi.string().required(),
+      avatar: Joi.string()
+        .required()
+        .pattern(/^(?:\w+:)?\/\/[^\s.]+\.\S{2}\S*$/),
     }),
   }),
-  updateAvatar,
+  updateAvatar
 );
 
 module.exports = router;

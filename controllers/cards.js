@@ -1,7 +1,7 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/not-found-err');
 const BadRequestError = require('../errors/bad-req-err');
-const UnauthorizedError = require('../errors/unauthorized-err');
+const ForbiddenError = require('../errors/forbidden-err');
 
 // eslint-disable-next-line no-unused-vars
 const checkDate = (err, res, errorText) => {
@@ -22,7 +22,7 @@ module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
       if (!(card.owner.toString() === user)) {
-        throw new UnauthorizedError('Ошибка аутентификации');
+        throw new ForbiddenError('Ошибка аутентификации');
       } else if (!card) {
         throw new NotFoundError('Карточка не найдена');
       } else {
