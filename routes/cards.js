@@ -7,6 +7,7 @@ const {
   likeCard,
   dislikeCard,
 } = require('../controllers/cards');
+const linkRegExp = require('../utils/regexp');
 
 router.get('/cards', getCards);
 
@@ -27,7 +28,7 @@ router.post(
       name: Joi.string().required().min(2).max(30),
       link: Joi.string()
         .required()
-        .pattern(/^(?:\w+:)?\/\/[^\s.]+\.\S{2}\S*$/),
+        .pattern(linkRegExp),
     }),
   }),
   createCard,

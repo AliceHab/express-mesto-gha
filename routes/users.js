@@ -7,6 +7,7 @@ const {
   updateAvatar,
   getCurrentUser,
 } = require('../controllers/users');
+const linkRegExp = require('../utils/regexp');
 
 router.get('/users', getUsers);
 
@@ -39,7 +40,7 @@ router.patch(
     body: Joi.object().keys({
       avatar: Joi.string()
         .required()
-        .pattern(/^(?:\w+:)?\/\/[^\s.]+\.\S{2}\S*$/),
+        .pattern(linkRegExp),
     }),
   }),
   updateAvatar,
