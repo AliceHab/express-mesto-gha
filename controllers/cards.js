@@ -21,16 +21,17 @@ module.exports.deleteCard = (req, res, next) => {
 
   Card.findById(req.params.cardId)
     .then((card) => {
-      if (!(card.owner.toString() === user)) {
-        throw new ForbiddenError('Ошибка аутентификации');
-      } else if (!card) {
+      if (!card) {
         throw new NotFoundError('Карточка не найдена');
+      } else if (!(card.owner.toString() === user)) {
+        throw new ForbiddenError('Ошибка аутентификации');
       } else {
         Card.findByIdAndRemove(req.params.cardId)
           .then((deletedCard) => {
             res.send({ data: deletedCard });
           })
           .catch((err) => {
+            console.log(err);
             if (err.kind === 'ObjectId') {
               throw new BadRequestError('Ошибка в данных');
             }
@@ -59,7 +60,7 @@ module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true, runValidators: true }
   )
     .then((card) => {
       if (!card) {
@@ -81,7 +82,7 @@ module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true, runValidators: true },
+    { new: true, runValidators: true }
   )
     .then((card) => {
       if (!card) {
