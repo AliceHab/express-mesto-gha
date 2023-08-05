@@ -14,8 +14,7 @@ const errorHandler = require('./middlewares/error-handler');
 
 const app = express();
 
-const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } =
-  process.env;
+const { PORT = 3000, DB_URL = 'mongodb://127.0.0.1:27017/mestodb' } = process.env;
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -39,7 +38,7 @@ app.post(
       avatar: Joi.string().pattern(/^(?:\w+:)?\/\/[^\s.]+\.\S{2}\S*$/),
     }),
   }),
-  createUser
+  createUser,
 );
 app.post(
   '/signin',
@@ -49,7 +48,7 @@ app.post(
       password: Joi.string().required(),
     }),
   }),
-  login
+  login,
 );
 
 // Пользователь
