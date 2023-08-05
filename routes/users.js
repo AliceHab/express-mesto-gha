@@ -19,7 +19,7 @@ router.get(
       userId: Joi.string().length(24).hex().required(),
     }),
   }),
-  getUser
+  getUser,
 );
 
 router.patch(
@@ -30,7 +30,7 @@ router.patch(
       about: Joi.string().min(2).max(30),
     }),
   }),
-  updateUser
+  updateUser,
 );
 
 router.patch(
@@ -42,7 +42,7 @@ router.patch(
         .pattern(/^(?:\w+:)?\/\/[^\s.]+\.\S{2}\S*$/),
     }),
   }),
-  updateAvatar
+  updateAvatar,
 );
 
 module.exports = router;

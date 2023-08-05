@@ -17,7 +17,7 @@ router.delete(
       cardId: Joi.string().length(24).hex().required(),
     }),
   }),
-  deleteCard
+  deleteCard,
 );
 
 router.post(
@@ -30,7 +30,7 @@ router.post(
         .pattern(/^(?:\w+:)?\/\/[^\s.]+\.\S{2}\S*$/),
     }),
   }),
-  createCard
+  createCard,
 );
 
 router.put(
@@ -40,7 +40,7 @@ router.put(
       cardId: Joi.string().length(24).hex().required(),
     }),
   }),
-  likeCard
+  likeCard,
 );
 
 router.delete(
@@ -50,7 +50,7 @@ router.delete(
       cardId: Joi.string().length(24).hex().required(),
     }),
   }),
-  dislikeCard
+  dislikeCard,
 );
 
 module.exports = router;
