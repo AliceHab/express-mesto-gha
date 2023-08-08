@@ -12,6 +12,7 @@ const linkRegExp = require('./utils/regexp');
 
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/error-handler');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 
@@ -27,6 +28,9 @@ app.use(bodyParser.json());
 app.use(limiter);
 
 mongoose.connect(DB_URL, {});
+
+// логгер запросов
+app.use(requestLogger);
 
 app.post(
   '/signup',
@@ -66,6 +70,8 @@ app.use(require('./routes/cards'));
 app.use('*', (req, res) => {
   throw new NotFoundError('Страница не найдена');
 });
+
+app.use(errorLogger);
 
 app.use(errors());
 
